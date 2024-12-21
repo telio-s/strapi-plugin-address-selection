@@ -1,0 +1,7 @@
+{
+  "address-selection.form.label.address": "บ้านเลขที่",
+  "address-selection.form.label.zipCode": "รหัสไปรษณีย์",
+  "address-selection.form.label.province": "จังหวัด",
+  "address-selection.form.label.district": "เขต/อำเภอ",
+  "address-selection.form.label.subdistrict": "แขวง/ตำบล"
+}

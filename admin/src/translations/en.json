@@ -1,0 +1,7 @@
+{
+  "address-selection.form.label.address": "House number",
+  "address-selection.form.label.zipCode": "Zip Code",
+  "address-selection.form.label.province": "Province",
+  "address-selection.form.label.district": "District",
+  "address-selection.form.label.subdistrict": "Subdistrict"
+}
