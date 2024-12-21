@@ -7,6 +7,15 @@ export type TAddress = {
   subdistrict: string;
 };
 
+export type TZipCode = {
+  ZIPCODE_ID: number;
+  SUB_DISTRICT_CODE: string;
+  PROVINCE_ID: string;
+  DISTRICT_ID: string;
+  SUB_DISTRICT_ID: string;
+  ZIPCODE: string;
+};
+
 export type TProvince = {
   PROVINCE_ID: number;
   PROVINCE_CODE: string;
@@ -29,15 +38,6 @@ export type TSubdistrict = {
   DISTRICT_ID: number;
   PROVINCE_ID: number;
   GEO_ID: number;
-};
-
-export type TZipCode = {
-  ZIPCODE_ID: number;
-  SUB_DISTRICT_CODE: string;
-  PROVINCE_ID: string;
-  DISTRICT_ID: string;
-  SUB_DISTRICT_ID: string;
-  ZIPCODE: string;
 };
 
 export interface ICountryConfig {

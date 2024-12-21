@@ -13,7 +13,7 @@ import {
 import { countries } from 'countries-list';
 import { type InputProps, type FieldValue } from '@strapi/strapi/admin';
 import { getTranslation } from '../../utils/getTranslation';
-import { TAddress, TProvince, TDistrict, TSubdistrict } from '../../utils/type';
+import { TZipCode, TAddress, TProvince, TDistrict, TSubdistrict } from '../../utils/type';
 import type { ICountry, TCountryCode } from 'countries-list';
 import { useAddressData } from '../../utils/useAddressData';
 import { getAddressDataConfig as getCountriesAvaliableConfig } from '../../sources/address-config';
@@ -33,7 +33,7 @@ export const AddressInput = React.forwardRef<HTMLElement, AddressInputProps>((pr
   } = props;
   const { formatMessage } = useIntl();
   const [country, setCountry] = React.useState<{ code: TCountryCode; item: ICountry }>();
-  const [zipCode, setZipCode] = React.useState<string>();
+  const [zipCode, setZipCode] = React.useState<{ zipcode: string; values: TZipCode[] }>();
   const [province, setProvince] = React.useState<TProvince>();
   const [district, setDistrict] = React.useState<TDistrict>();
   const [result, setResult] = React.useState<TAddress>({
@@ -47,8 +47,8 @@ export const AddressInput = React.forwardRef<HTMLElement, AddressInputProps>((pr
   const { ZipCodes, Provinces, Districts, Subdistricts } = useAddressData(country?.code || 'US');
   const [paginationCountries, setPaginationCountry] = React.useState<number>(1);
 
-  const getAllCountries = React.useMemo(() => {
-    let c: { code: TCountryCode; country: ICountry }[] = Object.keys(
+  const getCountry = React.useMemo(() => {
+    let mapCodeCountry: { code: TCountryCode; country: ICountry }[] = Object.keys(
       getCountriesAvaliableConfig()
     ).map((key: string) => {
       return {
@@ -57,11 +57,7 @@ export const AddressInput = React.forwardRef<HTMLElement, AddressInputProps>((pr
       };
     });
 
-    return c;
-  }, []);
-
-  const getCountry = React.useMemo(() => {
-    let c: { code: TCountryCode; country: ICountry }[] = getAllCountries.splice(
+    let c: { code: TCountryCode; country: ICountry }[] = mapCodeCountry.splice(
       0,
       paginationCountries * 10
     );
@@ -72,16 +68,28 @@ export const AddressInput = React.forwardRef<HTMLElement, AddressInputProps>((pr
   const [countriesList, setCountriesList] =
     React.useState<{ code: TCountryCode; country: ICountry }[]>(getCountry);
 
+  const getZipCode = React.useCallback((z: string) => {
+    return ZipCodes.filter((item) => item.ZIPCODE === z);
+  }, []);
+
   const getProvince = React.useMemo(() => {
-    if (zipCode?.length === 5) {
-      const z = ZipCodes.findIndex((value, index) => value.ZIPCODE === zipCode);
-      return Provinces.filter((item) => item.PROVINCE_ID.toString() === ZipCodes[z]?.PROVINCE_ID);
-    } else return [];
+    const z = ZipCodes.findIndex((value, index) => value.ZIPCODE === zipCode?.zipcode);
+    return Provinces.filter((item) => item.PROVINCE_ID.toString() === ZipCodes[z]?.PROVINCE_ID);
   }, [zipCode]);
 
   const getDistrict = React.useMemo(() => {
-    const x = Districts.filter((item) => item.PROVINCE_ID === province?.PROVINCE_ID);
-    return x;
+    let districts: TDistrict[] = [];
+    const districtIds = zipCode?.values.filter(
+      (value, index, self) => self.findIndex((v) => v.DISTRICT_ID === value.DISTRICT_ID) === index
+    );
+    if (!districtIds) return [];
+    for (let zIndex = 0; zIndex < districtIds?.length; zIndex++) {
+      const d = Districts.filter(
+        (item) => item.DISTRICT_ID.toString() === districtIds[zIndex].DISTRICT_ID
+      );
+      districts = districts.concat(d);
+    }
+    return districts;
   }, [province]);
 
   const getSubdistrict = React.useMemo(() => {
@@ -125,30 +133,34 @@ export const AddressInput = React.forwardRef<HTMLElement, AddressInputProps>((pr
     } as React.ChangeEvent<HTMLInputElement>);
   };
 
-  const handleOnChangeCountry = ({ code, item }: { code: TCountryCode; item: ICountry }) => {
-    if (!item || !code) return;
-    onClearResult('country');
-    setCountry({ code, item });
-    setResult((prev) => ({ ...prev, country: item.name }));
-    onChange({
-      target: {
-        name,
-        value: JSON.stringify({ ...result, country: item.name }),
-      },
-    } as React.ChangeEvent<HTMLInputElement>);
+  const handleOnChangeCountry = (props: { code: TCountryCode; item: ICountry }) => {
+    const { code, item } = props;
+    if (item && code) {
+      onClearResult('country');
+      setCountry({ code, item });
+      setResult((prev) => ({ ...prev, country: item.name }));
+      onChange({
+        target: {
+          name,
+          value: JSON.stringify({ ...result, country: item.name }),
+        },
+      } as React.ChangeEvent<HTMLInputElement>);
+    }
   };
 
   const handleOnChangeZipCode = (item: string) => {
-    if (!item) return;
-    onClearResult('zipcode');
-    setZipCode(item);
-    setResult((prev) => ({ ...prev, zipcode: item }));
-    onChange({
-      target: {
-        name,
-        value: JSON.stringify({ ...result, zipcode: item }),
-      },
-    } as React.ChangeEvent<HTMLInputElement>);
+    if (item || item === '') {
+      onClearResult('zipcode');
+      const zipCodes = getZipCode(item);
+      setZipCode({ zipcode: item, values: zipCodes });
+      setResult((prev) => ({ ...prev, zipcode: item }));
+      onChange({
+        target: {
+          name,
+          value: JSON.stringify({ ...result, zipcode: item }),
+        },
+      } as React.ChangeEvent<HTMLInputElement>);
+    }
   };
 
   const handleOnChangeProvince = (item: TProvince) => {
@@ -202,11 +214,12 @@ export const AddressInput = React.forwardRef<HTMLElement, AddressInputProps>((pr
           disabled={disabled}
           value={value}
           textValue={result.country}
+          filterValue={result.country}
           onInputChange={(e: React.FormEvent<HTMLInputElement>) =>
             setResult((prev) => ({ ...prev, country: e.currentTarget.value }))
           }
           onFilterValueChange={(value: string) => {
-            const thisCountry = getAllCountries.filter(({ code, country }) =>
+            const thisCountry = getCountry.filter(({ code, country }) =>
               country.name.toLowerCase().includes(value.toLowerCase())
             );
             setCountriesList(thisCountry);
@@ -245,16 +258,8 @@ export const AddressInput = React.forwardRef<HTMLElement, AddressInputProps>((pr
         <TextInput
           size="M"
           type="text"
-          maxLength="5"
           value={result.zipcode}
-          rules={{
-            maxLength: {
-              value: 5,
-              message: 'The length must be 5 characters',
-            },
-          }}
           onChange={(e: React.FormEvent<HTMLInputElement>) => {
-            setZipCode(e.currentTarget.value);
             handleOnChangeZipCode(e.currentTarget.value);
           }}
         />
@@ -272,6 +277,7 @@ export const AddressInput = React.forwardRef<HTMLElement, AddressInputProps>((pr
           disabled={disabled}
           value={value}
           textValue={result.province}
+          filterValue={result.province}
           onInputChange={(e: React.FormEvent<HTMLInputElement>) =>
             setResult((prev) => ({ ...prev, province: e.currentTarget.value }))
           }
@@ -301,6 +307,7 @@ export const AddressInput = React.forwardRef<HTMLElement, AddressInputProps>((pr
           disabled={disabled}
           value={value}
           textValue={result.district}
+          filterValue={result.district}
           onInputChange={(e: React.FormEvent<HTMLInputElement>) =>
             setResult((prev) => ({ ...prev, district: e.currentTarget.value }))
           }
@@ -330,6 +337,7 @@ export const AddressInput = React.forwardRef<HTMLElement, AddressInputProps>((pr
           disabled={disabled}
           value={value}
           textValue={result.subdistrict}
+          filterValue={result.subdistrict}
           onInputChange={(e: React.FormEvent<HTMLInputElement>) =>
             setResult((prev) => ({ ...prev, subdistrict: e.currentTarget.value }))
           }
