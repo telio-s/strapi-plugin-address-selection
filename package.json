@@ -1,5 +1,5 @@
 {
-  "name": "address-selection",
+  "name": "strapi-plugin-address-selection",
   "version": "1.0.0",
   "keywords": [],
   "type": "commonjs",

@@ -74,6 +74,9 @@ module.exports = {
 <p align="center">
     <img src="./docs/example.gif" alt="UI" width="500" />
 </p>
+<p align="center">
+    <img src="./docs/content-type.gif" alt="UI" width="500" />
+</p>
 
 ## 🧨 Troubleshooting
 
