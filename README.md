@@ -2,7 +2,7 @@
 
 **Address Selection** is a custom field plugin for Strapi (v5 and above) that provides an intuitive and user-friendly address form generator. With this plugin, users can input detailed address fields, and the form intelligently validates and filters entries based on the selected zip code.
 
-## ✨Features
+## ✨ Features
 
 - **Custom Address Fields**: Includes fields for country, zip code, province, district, subdistrict, and house number.
 - **Smart Filtering**: Automatically displays only the provinces, districts, and subdistricts matching the entered zip code.
@@ -11,7 +11,7 @@
 
 > **Note**: This plugin currently supports addresses in **Thailand** only. Feel free to fork the repository to customize it for other countries or contribute to expand its capabilities.
 
-## ⚙️Requirements
+## ⚙️ Requirements
 
 - **Strapi Version**: `>=5.0.0`
 - **Node.js Version**: `>=14.x`
@@ -23,7 +23,7 @@
 npm install strapi-plugin-address-selection
 ```
 
-## 🧩Configuration
+## 🧩 Configuration
 
 You can customize the behavior of the Address Selection plugin by modifying its configuration file located at:
 
@@ -44,7 +44,7 @@ module.exports = {
 };
 ```
 
-## 📮Usage
+## 📮 Usage
 
 1. **Add the Custom Field**:
 
@@ -54,7 +54,7 @@ module.exports = {
 
 2. **Save and Use**: Save the content type, and the address form will now be available in your entry forms.
 
-## How It Works
+## ⚡️ How It Works
 
 1. **Zip Code Validation**:
 
@@ -69,13 +69,13 @@ module.exports = {
    - Subdistrict (filtered by zip code)
    - House Number
 
-## 📸Screenshots
+## 📸 Screenshots
 
 <p align="center">
     <img src="./docs/example.gif" alt="UI" width="500" />
 </p>
 
-## 🧨Troubleshooting
+## 🧨 Troubleshooting
 
 If you encounter any issues:
 
