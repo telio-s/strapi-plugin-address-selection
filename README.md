@@ -35,7 +35,7 @@ Example:
 
 ```javascript
 module.exports = {
-  'strapi-plugin-address-selection': {
+  'address-selection': {
     enabled: true,
     config: {
       // Add custom configurations if required
