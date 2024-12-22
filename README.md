@@ -9,7 +9,7 @@
 - **Seamless Integration**: Works as a custom field in Strapi, making it easy to add to your content types.
 - **Developer-Friendly**: Fully compatible with Strapi's ecosystem and customizable as per project needs.
 
-> **Note**: This plugin currently supports addresses in **Thailand** only. Feel free to fork the repository to customize it for other countries or contribute to expand its capabilities.
+> **Note**: This plugin currently supports addresses in **Thailand** only [(Thailand Address source)](https://github.com/Cerberus/Thailand-Address). Feel free to fork the repository to customize it for other countries or contribute to expand its capabilities.
 
 ## ⚙️ Requirements
 
